@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parwati Niwas Rent Billing</title>
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="navbar">🏠 Parwati Niwas - Rent Billing</div>
+
+    <div class="container">
+        <h2>Generate Rent Bill</h2>
+        <input type="text" id="renter-name" placeholder="👤 Renter Name">
+        <input type="number" id="monthly-rent" placeholder="💰 Monthly Rent">
+        <input type="number" id="previous-reading" placeholder="📊 Previous Meter Reading">
+        <input type="number" id="current-reading" placeholder="📊 Current Meter Reading">
+        <input type="number" id="rate-per-unit" placeholder="⚡ Rate per Unit">
+        <input type="number" id="previous-dues" placeholder="📄 Previous Dues">
+        <button onclick="generateBill()">📜 Generate Bill</button>
+    </div>
+
+    <div class="bill" id="bill" style="display: none;">
+        <div class="bill-header">
+            <h3>🏠 Parwati Niwas</h3>
+            <p>Owner: Dinesh Sharma</p>
+            <p>Date: <span id="bill-date"></span></p>
+        </div>
+    
+        <p><b>👤 Renter:</b> <span id="bill-name"></span></p>
+        <p><b>💰 Monthly Rent:</b> ₹<span id="bill-rent"></span></p>
+        <p><b>⚡ Previous Meter Reading:</b> <span id="bill-previous-reading"></span> kWh</p>
+        <p><b>⚡ Current Meter Reading:</b> <span id="bill-current-reading"></span> kWh</p>
+        <p><b>⚡ Units Consumed:</b> <span id="bill-units"></span> kWh</p>
+        <p><b>⚡ Electricity Bill:</b> ₹<span id="bill-electricity"></span></p>
+        <p><b>📄 Previous Dues:</b> ₹<span id="bill-dues"></span></p>
+        <p class="total"><b>🛑 Total Amount:</b> ₹<span id="bill-total"></span></p>        
+    
+        <div id="qr-code">
+            <p><b>Scan to Pay</b></p>
+            <img src="qr.jpg" id="qr-img" alt="UPI QR Code">
+        </div>
+    
+        <div class="bill-footer">Thank you for your payment!</div>
+    
+        <div class="bottom-buttons">
+            <button onclick="downloadBill()">⬇️ Download</button>
+            <button onclick="sendWhatsApp()">📲 WhatsApp</button>
+        </div>
+    </div>
+        
+
+    <div class="history">
+        <h2>📜 Bill History</h2>
+        <ul id="bill-history">
+            <li>No bills generated yet.</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        &copy; 2025 <strong>Manas Prabhu</strong>. All Rights Reserved.
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+</html>
