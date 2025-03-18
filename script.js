@@ -1,21 +1,21 @@
 function generateBill() {
     let name = document.getElementById("renter-name").value;
-    let rent = document.getElementById("monthly-rent").value;
-    let prevReading = document.getElementById("previous-reading").value;
-    let currReading = document.getElementById("current-reading").value;
-    let rate = document.getElementById("rate-per-unit").value;
-    let dues = document.getElementById("previous-dues").value || 0; // Default to 0 if empty
+    let rent = parseFloat(document.getElementById("monthly-rent").value) || 0;
+    let prevReading = parseFloat(document.getElementById("previous-reading").value) || 0;
+    let currReading = parseFloat(document.getElementById("current-reading").value) || 0;
+    let rate = parseFloat(document.getElementById("rate-per-unit").value) || 0;
+    let dues = parseFloat(document.getElementById("previous-dues").value) || 0;
 
-    if (!name || !rent || !prevReading || !currReading || !rate) {
-        alert("Please fill all required fields!");
+    // Validation checks
+    if (!name || rent <= 0 || prevReading < 0 || currReading < 0 || rate <= 0) {
+        alert("Please fill all required fields correctly!");
         return;
     }
-
-    prevReading = parseFloat(prevReading);
-    currReading = parseFloat(currReading);
-    rate = parseFloat(rate);
-    rent = parseInt(rent);
-    dues = parseInt(dues);
+    
+    if (currReading < prevReading) {
+        alert("Current reading cannot be less than previous reading.");
+        return;
+    }
 
     let unitsConsumed = currReading - prevReading;
     let electricityBill = unitsConsumed * rate;
@@ -24,20 +24,18 @@ function generateBill() {
 
     // Display values in the bill
     document.getElementById("bill-name").innerText = name;
-    document.getElementById("bill-rent").innerText = rent;
+    document.getElementById("bill-rent").innerText = rent.toFixed(2);
     document.getElementById("bill-electricity").innerText = electricityBill.toFixed(2);
     document.getElementById("bill-units").innerText = unitsConsumed;
-    document.getElementById("bill-dues").innerText = dues;
-    document.getElementById("bill-total").innerText = total;
+    document.getElementById("bill-dues").innerText = dues.toFixed(2);
+    document.getElementById("bill-total").innerText = total.toFixed(2);
     document.getElementById("bill-date").innerText = date;
-    document.getElementById("bill-prev-reading").innerText = prevReading;
-    document.getElementById("bill-curr-reading").innerText = currReading;
+    document.getElementById("bill-previous-reading").innerText = prevReading;
+    document.getElementById("bill-current-reading").innerText = currReading;
 
     document.getElementById("bill").style.display = "block";
 
-    let billData = {
-        name, rent, electricityBill, unitsConsumed, prevReading, currReading, dues, total, date
-    };
+    let billData = { name, rent, electricityBill, unitsConsumed, prevReading, currReading, dues, total, date };
 
     saveBillHistory(billData);
 }
@@ -57,7 +55,7 @@ function loadBillHistory() {
     history.forEach((bill, index) => {
         let li = document.createElement("li");
         li.innerHTML = `
-            <b>${bill.name}</b> - ₹${bill.total} (${bill.date}) 
+            <b>${bill.name}</b> - ₹${bill.total.toFixed(2)} (${bill.date}) 
             <button class="delete-btn" onclick="deleteBill(${index})">🗑 Delete</button>
         `;
         historyList.appendChild(li);
@@ -87,11 +85,14 @@ function downloadBill() {
 function sendWhatsApp() {
     let name = document.getElementById("bill-name").innerText;
     let total = document.getElementById("bill-total").innerText;
-    let prevReading = document.getElementById("bill-prev-reading").innerText;
-    let currReading = document.getElementById("bill-curr-reading").innerText;
+    let prevReading = document.getElementById("bill-previous-reading").innerText;
+    let currReading = document.getElementById("bill-current-reading").innerText;
     let unitsConsumed = document.getElementById("bill-units").innerText;
+    let rent = document.getElementById("bill-rent").innerText;
+    let electricityBill = document.getElementById("bill-electricity").innerText;
+    let dues = document.getElementById("bill-dues").innerText;
     
-    let message = `🏠 *Parwati Niwas Rent Bill*\n👤 *Renter:* ${name}\n📅 *Date:* ${new Date().toLocaleDateString()}\n\n💰 *Monthly Rent:* ₹${rent}\n⚡ *Electricity Bill:* ₹${total}\n📊 *Previous Reading:* ${prevReading} kWh\n📊 *Current Reading:* ${currReading} kWh\n⚡ *Units Consumed:* ${unitsConsumed} kWh\n📄 *Previous Dues:* ₹${total}\n🛑 *Total Amount:* ₹${total}\n\n✅ *Scan the QR code to pay.*\nThank you!`;
+    let message = `🏠 *Parwati Niwas Rent Bill*\n👤 *Renter:* ${name}\n📅 *Date:* ${new Date().toLocaleDateString()}\n\n💰 *Monthly Rent:* ₹${rent}\n⚡ *Electricity Bill:* ₹${electricityBill}\n📊 *Previous Reading:* ${prevReading} kWh\n📊 *Current Reading:* ${currReading} kWh\n⚡ *Units Consumed:* ${unitsConsumed} kWh\n📄 *Previous Dues:* ₹${dues}\n🛑 *Total Amount:* ₹${total}\n\n✅ *Scan the QR code to pay.*\nThank you!`;
 
     let url = `https://wa.me/?text=${encodeURIComponent(message)}`;
     window.open(url, "_blank");
