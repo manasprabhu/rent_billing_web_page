@@ -1,4 +1,4 @@
-function generateBill() {
+function generateBill() { 
     let name = document.getElementById("renter-name").value;
     let rent = parseFloat(document.getElementById("monthly-rent").value) || 0;
     let prevReading = parseFloat(document.getElementById("previous-reading").value) || 0;
@@ -6,7 +6,6 @@ function generateBill() {
     let rate = parseFloat(document.getElementById("rate-per-unit").value) || 0;
     let dues = parseFloat(document.getElementById("previous-dues").value) || 0;
 
-    // Validation checks
     if (!name || rent <= 0 || prevReading < 0 || currReading < 0 || rate <= 0) {
         alert("Please fill all required fields correctly!");
         return;
@@ -22,7 +21,6 @@ function generateBill() {
     let total = rent + electricityBill + dues;
     let date = new Date().toLocaleDateString();
 
-    // Display values in the bill
     document.getElementById("bill-name").innerText = name;
     document.getElementById("bill-rent").innerText = rent.toFixed(2);
     document.getElementById("bill-electricity").innerText = electricityBill.toFixed(2);
@@ -36,7 +34,6 @@ function generateBill() {
     document.getElementById("bill").style.display = "block";
 
     let billData = { name, rent, electricityBill, unitsConsumed, prevReading, currReading, dues, total, date };
-
     saveBillHistory(billData);
 }
 
@@ -73,30 +70,54 @@ function deleteBill(index) {
     loadBillHistory();
 }
 
-function downloadBill() {
+function downloadBill(callback) {
     html2canvas(document.getElementById("bill")).then(canvas => {
         let link = document.createElement("a");
         link.href = canvas.toDataURL("image/png");
         link.download = "rent-bill.png";
         link.click();
+        
+        if (callback) callback();
     });
 }
 
 function sendWhatsApp() {
     let name = document.getElementById("bill-name").innerText;
-    let total = document.getElementById("bill-total").innerText;
+    let rent = document.getElementById("bill-rent").innerText;
     let prevReading = document.getElementById("bill-previous-reading").innerText;
     let currReading = document.getElementById("bill-current-reading").innerText;
     let unitsConsumed = document.getElementById("bill-units").innerText;
-    let rent = document.getElementById("bill-rent").innerText;
     let electricityBill = document.getElementById("bill-electricity").innerText;
     let dues = document.getElementById("bill-dues").innerText;
+    let total = document.getElementById("bill-total").innerText;
+    let date = document.getElementById("bill-date").innerText;
     
-    let message = `🏠 *Parwati Niwas Rent Bill*\n👤 *Renter:* ${name}\n📅 *Date:* ${new Date().toLocaleDateString()}\n\n💰 *Monthly Rent:* ₹${rent}\n⚡ *Electricity Bill:* ₹${electricityBill}\n📊 *Previous Reading:* ${prevReading} kWh\n📊 *Current Reading:* ${currReading} kWh\n⚡ *Units Consumed:* ${unitsConsumed} kWh\n📄 *Previous Dues:* ₹${dues}\n🛑 *Total Amount:* ₹${total}\n\n✅ *Scan the QR code to pay.*\nThank you!`;
+    let upiId = "6202154340@ptaxis";
+    let phoneNumber = "6202154340";
+    let upiPaymentLink = `upi://pay?pa=${upiId}&pn=Parwati%20Niwas&mc=&tid=&tr=&tn=Rent%20Payment&am=${total}&cu=INR`;
+    
+    let message = `🏠 *Parwati Niwas Rent Bill*
+👤 *Renter:* ${name}
+📅 *Date:* ${date}
 
-    let url = `https://wa.me/?text=${encodeURIComponent(message)}`;
-    window.open(url, "_blank");
+💰 *Monthly Rent:* ₹${rent}
+⚡ *Electricity Bill:* ₹${electricityBill}
+📊 *Previous Reading:* ${prevReading} kWh
+📊 *Current Reading:* ${currReading} kWh
+⚡ *Units Consumed:* ${unitsConsumed} kWh
+📄 *Previous Dues:* ₹${dues}
+🛑 *Total Amount:* ₹${total}
+
+✅ *Pay Now:* [Tap to Pay]( ${upiPaymentLink} )
+🔹 *UPI ID:* ${upiId}
+🔹 *Phone Number:* ${phoneNumber}
+
+Thank you!`;
+
+    downloadBill(() => {
+        let whatsappURL = `https://wa.me/?text=${encodeURIComponent(message)}`;
+        window.open(whatsappURL, "_blank");
+    });
 }
 
-// Load bill history on page load
 window.onload = loadBillHistory;
