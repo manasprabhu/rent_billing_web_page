@@ -1,12 +1,13 @@
 function generateBill() { 
     let name = document.getElementById("renter-name").value;
+    let month = document.getElementById("rent-month").value;
     let rent = parseFloat(document.getElementById("monthly-rent").value) || 0;
     let prevReading = parseFloat(document.getElementById("previous-reading").value) || 0;
     let currReading = parseFloat(document.getElementById("current-reading").value) || 0;
     let rate = parseFloat(document.getElementById("rate-per-unit").value) || 0;
     let dues = parseFloat(document.getElementById("previous-dues").value) || 0;
 
-    if (!name || rent <= 0 || prevReading < 0 || currReading < 0 || rate <= 0) {
+    if (!name || !month || rent <= 0 || prevReading < 0 || currReading < 0 || rate <= 0) {
         alert("Please fill all required fields correctly!");
         return;
     }
@@ -22,6 +23,7 @@ function generateBill() {
     let date = new Date().toLocaleDateString();
 
     document.getElementById("bill-name").innerText = name;
+    document.getElementById("bill-month").innerText = month;
     document.getElementById("bill-rent").innerText = rent.toFixed(2);
     document.getElementById("bill-electricity").innerText = electricityBill.toFixed(2);
     document.getElementById("bill-units").innerText = unitsConsumed;
@@ -33,7 +35,7 @@ function generateBill() {
 
     document.getElementById("bill").style.display = "block";
 
-    let billData = { name, rent, electricityBill, unitsConsumed, prevReading, currReading, dues, total, date };
+    let billData = { name, month, rent, electricityBill, unitsConsumed, prevReading, currReading, dues, total, date };
     saveBillHistory(billData);
 }
 
@@ -52,7 +54,7 @@ function loadBillHistory() {
     history.forEach((bill, index) => {
         let li = document.createElement("li");
         li.innerHTML = `
-            <b>${bill.name}</b> - ₹${bill.total.toFixed(2)} (${bill.date}) 
+            <b>${bill.name}</b> - ₹${bill.total.toFixed(2)} (${bill.month}) 
             <button class="delete-btn" onclick="deleteBill(${index})">🗑 Delete</button>
         `;
         historyList.appendChild(li);
@@ -83,6 +85,7 @@ function downloadBill(callback) {
 
 function sendWhatsApp() {
     let name = document.getElementById("bill-name").innerText;
+    let month = document.getElementById("bill-month").innerText;
     let rent = document.getElementById("bill-rent").innerText;
     let prevReading = document.getElementById("bill-previous-reading").innerText;
     let currReading = document.getElementById("bill-current-reading").innerText;
@@ -98,7 +101,8 @@ function sendWhatsApp() {
     
     let message = `🏠 *Parwati Niwas Rent Bill*
 👤 *Renter:* ${name}
-📅 *Date:* ${date}
+🗓 *Rent for the Month:* ${month}
+📅 *Bill Generated on:* ${date}
 
 💰 *Monthly Rent:* ₹${rent}
 ⚡ *Electricity Bill:* ₹${electricityBill}
