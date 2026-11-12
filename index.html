@@ -1,71 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Parwati Niwas Rent Billing</title>
-    <script src="https://cdn.jsdelivr.net/npm/html2canvas"></script>
-    <link rel="stylesheet" href="styles.css">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Parwati Niwas Rent Bills</title>
+<link href="https://fonts.googleapis.com/css2?family=Hind:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#eef1ec;--card:#fff;--ink:#1d2b26;--mute:#66756f;--line:#d9dfd9;--brand:#1f5c4a;--brand-ink:#fff;--accent:#c98a1b;--danger:#b3372c;--paper:#fffdf6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121a17;--card:#1b2622;--ink:#e8efeb;--mute:#93a39b;--line:#2c3a35;--brand:#4fb391;--brand-ink:#0c1f18;--accent:#e0a63c;--danger:#ef7b6e}}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 Hind,system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:560px;margin:0 auto;padding:14px 14px 40px}
+h1{font-size:20px;margin:6px 0 12px;font-weight:700}
+nav{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px}
+nav button{flex:1;border:0;background:none;color:var(--mute);font:600 15px Hind,system-ui,sans-serif;padding:10px 4px;border-radius:9px;cursor:pointer}
+nav button.on{background:var(--brand);color:var(--brand-ink)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:14px}
+label{display:block;font-size:13px;color:var(--mute);margin:10px 0 4px;font-weight:500}
+input,select{width:100%;font:500 16px Hind,system-ui,sans-serif;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink)}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--brand);outline-offset:1px}
+.row{display:flex;gap:10px}.row>*{flex:1;min-width:0}
+.btn{border:0;background:var(--brand);color:var(--brand-ink);font:600 15px Hind,system-ui,sans-serif;padding:12px 14px;border-radius:10px;cursor:pointer}
+.btn.alt{background:var(--bg);color:var(--ink);border:1px solid var(--line)}
+.btn.wa{background:#1f9d57;color:#fff}.btn.del{background:none;color:var(--danger);border:1px solid var(--line)}
+.btn.sm{padding:7px 10px;font-size:13px}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.hint{font-size:13px;color:var(--mute);margin:6px 0 0}
+.bill{background:var(--paper);color:#1d2b26;border:1px solid #e3dcc4;border-radius:6px;padding:18px 16px;font-family:Hind,system-ui,sans-serif}
+.bill h2{margin:0;font-size:22px}.bill .sub{color:#66756f;font-size:13px;margin-bottom:10px}
+.bill table{width:100%;border-collapse:collapse;font-size:15px}
+.bill td{padding:6px 0;border-bottom:1px dashed #d8d0b4;vertical-align:top}.bill td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+.bill tr.tot td{border-bottom:0;border-top:2px solid #1d2b26;font-size:19px;font-weight:700;padding-top:10px}
+.qr{display:flex;align-items:center;gap:14px;margin-top:14px}.qr small{color:#66756f;font-size:12.5px;line-height:1.35}
+.qrbox{width:112px;height:112px;background:#fff;padding:4px;border:1px solid #e3dcc4;flex:none}.qrbox img,.qrbox canvas{width:100%!important;height:100%!important}
+.hist{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.hist:last-child{border-bottom:0}.hist .m{flex:1;min-width:0}.hist b{display:block}.hist span{font-size:13px;color:var(--mute)}
+.tag{font-size:12px;font-weight:600;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line)}
+.tag.due{color:var(--danger)}.tag.ok{color:var(--brand)}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.show{opacity:1}
+.hide{display:none}
+</style>
 </head>
 <body>
+<div class="wrap">
+<h1>Parwati Niwas</h1>
+<nav id="nav"><button data-t="new" class="on">New bill</button><button data-t="hist">Bills</button><button data-t="set">Settings</button></nav>
 
-    <div class="navbar">🏠 Parwati Niwas - Rent Billing</div>
+<section id="new">
+ <div class="card">
+  <label for="tenant">Tenant name</label>
+  <input id="tenant" list="tenList2" placeholder="Type a name, or pick a saved tenant" autocomplete="off">
+  <datalist id="tenList2"></datalist>
+  <label for="phone">WhatsApp number</label>
+  <input id="phone" type="tel" inputmode="tel" placeholder="9876543210">
+  <div class="row"><div><label for="month">Month</label><input id="month" type="month"></div>
+  <div><label for="rent">Rent (₹)</label><input id="rent" type="number" inputmode="decimal"></div></div>
+  <div class="row"><div><label for="prev">Previous reading</label><input id="prev" type="number" inputmode="decimal"></div>
+  <div><label for="curr">Current reading</label><input id="curr" type="number" inputmode="decimal"></div></div>
+  <div class="row"><div><label for="rate">Rate per unit (₹)</label><input id="rate" type="number" inputmode="decimal"></div>
+  <div><label for="dues">Previous dues (₹)</label><input id="dues" type="number" inputmode="decimal"></div></div>
+  <label for="extra">Other charges (₹), optional</label><input id="extra" type="number" inputmode="decimal">
+ </div>
+ <div class="card" id="preview"></div>
+ <div class="actions">
+  <button class="btn" id="save">Save bill</button>
+  <button class="btn alt" id="shareImg">Share image</button>
+  <button class="btn wa" id="waBtn">WhatsApp</button>
+  <button class="btn alt" id="dlImg">Download image</button>
+ </div>
+ <p class="hint">Saving updates the tenant’s last reading and dues for next month.</p>
+</section>
 
-    <div class="container">
-        <h2>Generate Rent Bill</h2>
-        <input type="text" id="renter-name" placeholder="👤 Renter Name">
-        <input type="text" id="rent-month" placeholder="🗓 Rent for the Month (e.g., April 2025)">
-        <input type="number" id="monthly-rent" placeholder="💰 Monthly Rent">
-        <input type="number" id="previous-reading" placeholder="📊 Previous Meter Reading">
-        <input type="number" id="current-reading" placeholder="📊 Current Meter Reading">
-        <input type="number" id="rate-per-unit" placeholder="⚡ Rate per Unit">
-        <input type="number" id="previous-dues" placeholder="📄 Previous Dues">
-        <button onclick="generateBill()">📜 Generate Bill</button>
-    </div>
+<section id="hist" class="hide"><div class="card" id="histList"></div></section>
 
-    <div class="bill" id="bill" style="display: none;">
-        <div class="bill-header">
-            <h3>🏠 Parwati Niwas</h3>
-            <p>Owner: Dinesh Sharma</p>
-            <p>Date: <span id="bill-date"></span></p>
-        </div>
-    
-        <p><b>👤 Renter:</b> <span id="bill-name"></span></p>
-        <p><b>🗓 Rent for the Month:</b> <span id="bill-month"></span></p>
-        <p><b>💰 Monthly Rent:</b> ₹<span id="bill-rent"></span></p>
-        <p><b>⚡ Previous Meter Reading:</b> <span id="bill-previous-reading"></span> kWh</p>
-        <p><b>⚡ Current Meter Reading:</b> <span id="bill-current-reading"></span> kWh</p>
-        <p><b>⚡ Units Consumed:</b> <span id="bill-units"></span> kWh</p>
-        <p><b>⚡ Electricity Bill:</b> ₹<span id="bill-electricity"></span></p>
-        <p><b>📄 Previous Dues:</b> ₹<span id="bill-dues"></span></p>
-        <p class="total"><b>🛑 Total Amount:</b> ₹<span id="bill-total"></span></p>        
-    
-        <div id="qr-code">
-            <p><b>Scan to Pay</b></p>
-            <img src="qr.jpg" id="qr-img" alt="UPI QR Code">
-        </div>
-    
-        <div class="bill-footer">Thank you for your payment!</div>
-    
-        <div class="bottom-buttons">
-            <button onclick="downloadBill()">⬇️ Download</button>
-            <button onclick="sendWhatsApp()">📲 WhatsApp</button>
-        </div>
-    </div>
-        
+<section id="set" class="hide">
+ <div class="card">
+  <label for="owner">Owner name</label><input id="owner">
+  <label for="upi">UPI ID (for the QR on each bill)</label><input id="upi" placeholder="name@bank" autocapitalize="off">
+  <label for="ophone">Owner phone (shown in the WhatsApp message)</label><input id="ophone" type="tel">
+  <label for="defRate">Default rate per unit (₹)</label><input id="defRate" type="number" inputmode="decimal">
+  <button class="btn" id="saveSet" style="margin-top:12px">Save settings</button>
+ </div>
+ <div class="card">
+  <b>Tenants</b>
+  <div id="tenList"></div>
+  <label for="tName">Name</label><input id="tName">
+  <div class="row"><div><label for="tPhone">WhatsApp number</label><input id="tPhone" type="tel" placeholder="9876543210"></div>
+  <div><label for="tRent">Monthly rent (₹)</label><input id="tRent" type="number" inputmode="decimal"></div></div>
+  <div class="row"><div><label for="tRead">Current meter reading</label><input id="tRead" type="number" inputmode="decimal"></div>
+  <div><label for="tDues">Opening dues (₹)</label><input id="tDues" type="number" inputmode="decimal"></div></div>
+  <button class="btn" id="addTen" style="margin-top:12px">Add tenant</button>
+ </div>
+ <div class="card"><button class="btn alt" id="export">Copy backup data</button> <button class="btn alt" id="import">Restore from backup</button>
+ <p class="hint">Data is stored only in this browser. Copy a backup before clearing browser data.</p></div>
+</section>
+</div>
+<div class="toast" id="toast"></div>
 
-    <div class="history">
-        <h2>📜 Bill History</h2>
-        <ul id="bill-history">
-            <li>No bills generated yet.</li>
-        </ul>
-    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const KEY='parwati-niwas-v2';
+let S={settings:{owner:'Dinesh Sharma',upi:'6202154340@ptaxis',phone:'6202154340',rate:8},tenants:[],bills:[]};
+try{const r=localStorage.getItem(KEY);if(r)S=Object.assign(S,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){toast('Could not save in this browser')}};
+const num=v=>parseFloat(v)||0;
+const inr=n=>'₹'+(Math.round(n*100)/100).toLocaleString('en-IN');
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,5);
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('show');clearTimeout(toast.h);toast.h=setTimeout(()=>t.classList.remove('show'),2200)}
+const monthLabel=m=>{if(!m)return '';const[y,mo]=m.split('-');return new Date(y,mo-1,1).toLocaleDateString('en-IN',{month:'long',year:'numeric'})};
 
-    <div class="footer">
-        &copy; 2025 <strong>Manas Prabhu</strong>. All Rights Reserved.
-    </div>
+document.querySelectorAll('#nav button').forEach(b=>b.onclick=()=>{
+ document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('on',x===b));
+ ['new','hist','set'].forEach(s=>$(s).classList.toggle('hide',s!==b.dataset.t));
+ if(b.dataset.t==='hist')renderHist();if(b.dataset.t==='set')renderSet();
+});
 
-    <script src="script.js"></script>
+function fillTenants(){
+ $('tenList2').innerHTML=S.tenants.map(t=>`<option value="${esc(t.name)}">`).join('');if(!$('rate').value)$('rate').value=S.settings.rate;draw();
+}
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const cur=()=>{const n=$('tenant').value.trim().toLowerCase();return n?S.tenants.find(t=>t.name.toLowerCase()===n):undefined};
+function loadTenant(){
+ const t=cur();
+ if(t){$('rent').value=t.rent;$('prev').value=t.reading;$('dues').value=t.dues;$('phone').value=t.phone||'';$('curr').value='';$('extra').value=''}
+ draw();
+}
+function calc(){
+ const prev=num($('prev').value),curr=num($('curr').value),rate=num($('rate').value);
+ // Keep the real difference; valid() prevents a negative reading from being billed.
+ const units=curr-prev,elec=units*rate,rent=num($('rent').value),extra=num($('extra').value),dues=num($('dues').value);
+ return{prev,curr,rate,units,elec,rent,extra,dues,total:rent+elec+extra+dues};
+}
+function billData(){
+ const t=cur(),c=calc();
+ return Object.assign({id:uid(),tenantId:t?t.id:'',tenant:$('tenant').value.trim(),phone:$('phone').value.trim(),month:$('month').value,date:new Date().toISOString().slice(0,10),paid:false},c);
+}
+function billHTML(b){
+ const d=new Date(b.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+ const rows=[['Rent',inr(b.rent)],[`Electricity (${b.prev} → ${b.curr}, ${b.units} units × ₹${b.rate})`,inr(b.elec)]];
+ if(b.extra)rows.push(['Other charges',inr(b.extra)]);
+ if(b.dues)rows.push(['Previous dues',inr(b.dues)]);
+ return `<div class="bill"><h2>Parwati Niwas</h2><div class="sub">Owner: ${esc(S.settings.owner)} · ${d}</div>
+ <div><b>${esc(b.tenant||'Select a tenant')}</b><br><span style="color:#66756f">Rent for ${monthLabel(b.month)||'—'}</span></div>
+ <table style="margin-top:8px">${rows.map(r=>`<tr><td>${r[0]}</td><td>${r[1]}</td></tr>`).join('')}<tr class="tot"><td>Total due</td><td>${inr(b.total)}</td></tr></table>
+ ${S.settings.upi?`<div class="qr"><div class="qrbox" id="qrbox"></div><small>Scan to pay ${inr(b.total)}<br>UPI: ${esc(S.settings.upi)}</small></div>`:''}
+ <p style="text-align:center;color:#66756f;font-size:13px;margin:14px 0 0">Thank you for your payment!</p></div>`;
+}
+function draw(){
+ const prev=num($('prev').value),curr=num($('curr').value);
+ // Do not show a misleading zero-charge bill when the readings are inconsistent.
+ if($('curr').value!=='' && curr<prev){
+  $('preview').innerHTML=`<div class="card" style="border-color:var(--danger);color:var(--danger)">
+   <b>Invalid meter readings</b>
+   <p class="hint" style="color:inherit">Current reading (${curr}) is lower than previous reading (${prev}). Please check and correct the readings before generating the bill.</p>
+  </div>`;
+  return;
+ }
+ const b=billData();$('preview').innerHTML=billHTML(b);
+ const box=$('qrbox');
+ if(box&&window.QRCode&&b.total>0){
+  const link=`upi://pay?pa=${encodeURIComponent(S.settings.upi)}&pn=${encodeURIComponent(S.settings.owner)}&am=${b.total.toFixed(2)}&cu=INR&tn=${encodeURIComponent('Rent '+monthLabel(b.month))}`;
+  try{new QRCode(box,{text:link,width:104,height:104,correctLevel:QRCode.CorrectLevel.M})}catch(e){}
+ }
+}
+['month','rent','prev','curr','rate','dues','extra'].forEach(i=>$(i).addEventListener('input',draw));
+$('tenant').addEventListener('input',loadTenant);$('tenant').addEventListener('focus',e=>e.target.select());
 
+function valid(){
+ if(!$('tenant').value.trim()){toast('Type the tenant name');return false}
+ if(num($('curr').value)<num($('prev').value)){toast('Current reading is lower than previous');return false}
+ if(!$('month').value){toast('Pick the month');return false}
+ return true;
+}
+function commit(){
+ const b=billData();let t=cur();
+ if(!t){t={id:uid(),name:b.tenant};S.tenants.push(t);fillTenants()}
+ b.tenantId=t.id;t.phone=b.phone;S.bills.unshift(b);t.reading=b.curr;t.dues=b.total;t.rent=b.rent;
+ save();return b;
+}
+let lastSaved=null;
+$('save').onclick=()=>{if(!valid())return;lastSaved=commit();toast('Bill saved. You can share it now.')};
+
+function waText(b){
+ return `*Parwati Niwas – Rent Bill*\nTenant: ${b.tenant}\nMonth: ${monthLabel(b.month)}\n\nRent: ${inr(b.rent)}\nElectricity: ${inr(b.elec)} (${b.units} units × ₹${b.rate}, reading ${b.prev} → ${b.curr})\n`+(b.extra?`Other charges: ${inr(b.extra)}\n`:'')+(b.dues?`Previous dues: ${inr(b.dues)}\n`:'')+`\n*Total due: ${inr(b.total)}*\n`+(S.settings.upi?`Pay by UPI: ${S.settings.upi}\n`:'')+(S.settings.phone?`Phone: ${S.settings.phone}\n`:'')+`\nThank you! – ${S.settings.owner}`;
+}
+function openWA(b){
+ let p=(b.phone||'').replace(/\D/g,'');if(p.length===10)p='91'+p;
+ window.open(`https://wa.me/${p}?text=${encodeURIComponent(waText(b))}`,'_blank');
+}
+$('waBtn').onclick=()=>{if(!valid())return;const b=sameSaved()?lastSaved:commit();lastSaved=b;openWA(b)};
+function loadTenantKeep(){toast('Bill saved')}
+
+async function toBlob(el){const c=await html2canvas(el,{scale:2,backgroundColor:'#fffdf6'});return new Promise(r=>c.toBlob(r,'image/png'))}
+async function imgFlow(share,node,name){
+ try{
+  const blob=await toBlob(node),file=new File([blob],name+'.png',{type:'image/png'});
+  if(share&&navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:name});return}
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name+'.png';a.click();toast(share?'Sharing not supported here, image downloaded':'Image downloaded');
+ }catch(e){if(e&&e.name!=='AbortError')toast('Could not create image')}
+}
+const fname=b=>('rent-'+(b.tenant||'bill')+'-'+b.month).replace(/\s+/g,'-');
+const sameSaved=()=>lastSaved&&lastSaved.tenant.toLowerCase()===$('tenant').value.trim().toLowerCase()&&lastSaved.month===$('month').value;
+function ensureSaved(){if(!valid())return null;if(!sameSaved()){lastSaved=commit();toast('Bill saved')}return lastSaved}
+$('shareImg').onclick=()=>{const b=ensureSaved();if(b)imgFlow(true,$('preview').firstElementChild,fname(b))};
+$('dlImg').onclick=()=>{const b=ensureSaved();if(b)imgFlow(false,$('preview').firstElementChild,fname(b))};
+
+function renderHist(){
+ const el=$('histList');
+ if(!S.bills.length){el.innerHTML='<p class="hint">No bills yet. Create one in the New bill tab.</p>';return}
+ el.innerHTML=S.bills.map(b=>`<div class="hist"><div class="m"><b>${esc(b.tenant)}</b><span>${monthLabel(b.month)} · ${inr(b.total)}</span></div>
+ <span class="tag ${b.paid?'ok':'due'}">${b.paid?'Paid':'Unpaid'}</span>
+ <button class="btn alt sm" data-a="wa" data-id="${b.id}">Send</button>
+ <button class="btn alt sm" data-a="pay" data-id="${b.id}">${b.paid?'Undo':'Paid'}</button>
+ <button class="btn del sm" data-a="del" data-id="${b.id}" aria-label="Delete bill">✕</button></div>`).join('');
+ el.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{
+  const b=S.bills.find(x=>x.id===btn.dataset.id),t=S.tenants.find(x=>x.id===b.tenantId),a=btn.dataset.a;
+  if(a==='wa')openWA(b);
+  if(a==='pay'){b.paid=!b.paid;if(t)t.dues=b.paid?Math.max(0,t.dues-b.total):t.dues+b.total;save();renderHist()}
+  if(a==='del'&&confirm('Delete this bill?')){S.bills=S.bills.filter(x=>x!==b);save();renderHist()}
+ });
+}
+
+function renderSet(){
+ $('owner').value=S.settings.owner;$('upi').value=S.settings.upi;$('ophone').value=S.settings.phone||'';$('defRate').value=S.settings.rate;
+ $('tenList').innerHTML=S.tenants.length?S.tenants.map(t=>`<div class="hist"><div class="m"><b>${esc(t.name)}</b><span>Rent ${inr(t.rent)} · reading ${t.reading} · dues ${inr(t.dues)}</span></div><button class="btn del sm" data-id="${t.id}">Remove</button></div>`).join(''):'<p class="hint">No tenants yet.</p>';
+ $('tenList').querySelectorAll('button').forEach(b=>b.onclick=()=>{if(confirm('Remove this tenant? Their saved bills stay.')){S.tenants=S.tenants.filter(t=>t.id!==b.dataset.id);save();renderSet();fillTenants()}});
+}
+$('saveSet').onclick=()=>{S.settings={owner:$('owner').value.trim()||'Owner',upi:$('upi').value.trim(),phone:$('ophone').value.trim(),rate:num($('defRate').value)||8};save();toast('Settings saved');$('rate').value=S.settings.rate;draw()};
+$('addTen').onclick=()=>{
+ const name=$('tName').value.trim();if(!name){toast('Enter a tenant name');return}
+ S.tenants.push({id:uid(),name,phone:$('tPhone').value.trim(),rent:num($('tRent').value),reading:num($('tRead').value),dues:num($('tDues').value)});
+ save();['tName','tPhone','tRent','tRead','tDues'].forEach(i=>$(i).value='');renderSet();fillTenants();toast('Tenant added');
+};
+$('export').onclick=async()=>{const s=JSON.stringify(S);try{await navigator.clipboard.writeText(s);toast('Backup copied')}catch(e){prompt('Copy this backup:',s)}};
+$('import').onclick=()=>{const s=prompt('Paste backup data');if(!s)return;try{const d=JSON.parse(s);if(!d.tenants||!d.bills)throw 0;S=Object.assign(S,d);save();renderSet();fillTenants();toast('Backup restored')}catch(e){toast('That backup is not valid')}};
+
+$('month').value=new Date().toISOString().slice(0,7);
+fillTenants();
+</script>
 </body>
 </html>
